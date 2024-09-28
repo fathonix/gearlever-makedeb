@@ -1,15 +1,15 @@
 # Maintainer: Luke Featherston <lukefeatherston1223 at gmail dot com>
+# Contributor: Aldo Adirajasa Fathoni <aldo dot alfathoni at gmail dot com>
 pkgname=gearlever
 pkgver=2.0.7
 pkgrel=1
 pkgdesc="Manage AppImages with ease"
-arch=('x86_64')
+arch=('all')
 url="https://mijorus.it/projects/gearlever/"
-license=('GPL-3.0-or-later')
-depends=( 'binutils' 'dconf' 'fuse2' 'gdk-pixbuf2' 'glibc' 'glib2' 'gtk4' 'hicolor-icon-theme' 'libadwaita' 'p7zip' 'pango' 'python' 'python-dbus' 'python-gobject' 'python-pyxdg' 'python-requests' 'zlib' )
-makedepends=( 'gettext' 'meson' )
+license=('GPL-3')
+depends=( 'binutils' 'libfuse2' 'libgdk-pixbuf-2.0-0' 'libc6' 'libglib-2.0-0' 'gtk4-binver-4.0.0' 'hicolor-icon-theme' 'libadwaita-1-0' 'p7zip' 'libpango-1.0-0' 'python3' 'python3-dbus' 'python3-gi' 'python3-xdg' 'python3-requests' 'libz1' )
+makedepends=( 'gettext' 'meson' 'python3-dbus-dev' 'python3-gi-dev' 'python3-xdg-dev' 'python3-requests-dev')
 checkdepends=( 'appstream' 'desktop-file-utils' )
-options=( '!strip' '!debug' )
 source=(
 	"${pkgname}-${pkgver}.tar.gz"::"https://github.com/mijorus/gearlever/archive/refs/tags/${pkgver}.tar.gz"
 )
@@ -25,19 +25,19 @@ prepare() {
 }
 
 build() {
-	arch-meson "${srcdir}/${pkgname}-${pkgver}" build
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	meson setup build --prefix=/usr
 	meson compile -C build
 }
 
 check() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
 	meson test -C build --print-errorlogs
 }
 
 package() {
-	meson install -C build --destdir "${pkgdir}"
-	
 	cd "${srcdir}/${pkgname}-${pkgver}"
-	install -Dm644 COPYING -t "${pkgdir}/usr/share/licenses/$pkgname/"
+	meson install -C build --destdir "${pkgdir}"
 	
 	cd "${pkgdir}"
 	rm -v "usr/share/icons/hicolor/scalable/actions/meson.build"
